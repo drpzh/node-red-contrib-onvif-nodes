@@ -25,7 +25,17 @@ Node Red nodes for communicating with OnVif compliant IP devices
 
 ---
 
-## Local Modifications (drpzhu — Tapo Camera Stability)
+## Tapo Camera Setup Instructions
+
+> [!IMPORTANT]
+> **Required Tapo App Setting**:  
+> In the Tapo App, go to: **Me** -> **Third-Party Services** -> set **Third-Party Compatibility** to **ON**.  
+> 
+> *Also ensure an ONVIF Camera Account (username & password) is created under: **Camera Settings** -> **Advanced Settings** -> **Camera Account**.*
+
+---
+
+## Local Modifications (drpzh — Tapo Camera Stability)
 
 This fork contains custom patches on top of the original upstream code to improve stability with ~30 Tapo cameras in a warehouse environment.
 
