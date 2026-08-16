@@ -19,6 +19,8 @@
             port: {value:80, required:true},
             timeout: {value: 30, require:true}, // Default is otherwise 120 sec in agsh/onvif
             checkConnectionInterval: {value: 5},
+            reconnectDelay: {value: 5},          // Initial reconnect backoff (seconds)
+            maxReconnectDelay: {value: 120},      // Maximum reconnect backoff cap (seconds)
             name: {value:""}
         },   
         credentials: {
@@ -35,12 +37,20 @@
         oneditprepare: function() {
             // Old nodes had no timeout property (which means the default timeout of 12 seconds from the agsh/onvif library was being used)
             if (this.timeout == undefined) {
-                $('#node-config-input-timeout').val(3);
+                $('#node-config-input-timeout').val(30);
             }
        
             // Old nodes had no checkConnectionInterval property
             if (this.checkConnectionInterval == undefined) {
                 $('#node-config-input-checkConnectionInterval').val(5);
+            }
+
+            // Old nodes had no reconnect delay properties
+            if (this.reconnectDelay == undefined) {
+                $('#node-config-input-reconnectDelay').val(5);
+            }
+            if (this.maxReconnectDelay == undefined) {
+                $('#node-config-input-maxReconnectDelay').val(120);
             }
         }
     });
@@ -73,6 +83,14 @@
         <input type="number" id="node-config-input-checkConnectionInterval" style="width:45px; height:28px;" autocomplete="off" dir="">&nbsp;
         <span>seconds</span>
     </div>
+    <div class='form-row'>
+        <label for='node-config-input-reconnectDelay'><i class='fa fa-plug'></i> Reconnect</label>
+        <span>Initial reconnect backoff</span>&nbsp;
+        <input type="number" id="node-config-input-reconnectDelay" style="width:45px; height:28px;" autocomplete="off" min="1">&nbsp;
+        <span>s &nbsp; max</span>&nbsp;
+        <input type="number" id="node-config-input-maxReconnectDelay" style="width:55px; height:28px;" autocomplete="off" min="5">&nbsp;
+        <span>s</span>
+    </div>
     </br>
     <div class="form-row">
         <label for="node-config-input-name"><i class="icon-tag"></i> Name</label>
@@ -93,4 +111,9 @@
     Specify how many seconds needs to be waited for an answer, when connecting to an Onvif device.  When no response has been received during the timeout interval, the device will be considered as 'disconnected'.</p>
     <p><strong>Refresh:</strong><br/>
     Specify at which interval (in seconds) the connection to the Onvif device should be checked, to make sure both the node status and the device data are up to date.  Note that an interval of 0 seconds is used to disable automatic checking the device connection.</p>
+    <p><strong>Reconnect:</strong><br/>
+    When the camera disconnects, the node will automatically attempt to reconnect using exponential backoff.
+    <em>Initial reconnect backoff</em> (default 5 s) is the base delay before the first retry; it doubles on each failure.
+    <em>Max reconnect delay</em> (default 120 s) caps the maximum wait between attempts.
+    A small random jitter is added to each delay so that multiple cameras in the same network do not all reconnect simultaneously.</p>
 </script>

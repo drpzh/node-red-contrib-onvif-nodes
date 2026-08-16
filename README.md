@@ -23,6 +23,51 @@ Node Red nodes for communicating with OnVif compliant IP devices
 
 *That is why it is all taking so long ...*
 
+---
+
+## Local Modifications (drpzhu — Tapo Camera Stability)
+
+This fork contains custom patches on top of the original upstream code to improve stability with ~30 Tapo cameras in a warehouse environment.
+
+### 2026-02-22 — Automatic Reconnection & Event Recovery
+
+**Problem:** Cameras (especially Tapo C-series) would drop their connection daily and required a manual Node-RED restart to recover. Event polling also stopped permanently after any disconnect.
+
+**Changes:**
+
+#### `onvif_config.js`
+- **Exponential backoff reconnect loop**: When `getSystemDateAndTime()` health-check fails, the node now automatically schedules reconnect attempts using exponential backoff (`initialDelay × 2^attempt`, capped at `maxReconnectDelay`), with ±20% jitter to stagger 30 cameras after a simultaneous drop (e.g. switch reboot).
+- **Fresh `onvif.Cam` instance on every reconnect**: Stale TCP sockets from the previous connection are discarded — mirrors Shinobi NVR's `createOnvifDevice()` pattern.
+- **New `"reconnecting"` status**: Emitted between `"disconnected"` and `"connected"` so downstream nodes can show intermediate state.
+- **Two new config fields** (backward-compatible, defaults apply to existing nodes):
+  - `reconnectDelay` — initial backoff in seconds (default: 5)
+  - `maxReconnectDelay` — cap for exponential growth in seconds (default: 120)
+
+#### `onvif_events.js`
+- **Auto-restart event polling after reconnect**: Added `wasListening` / `stopPullingPermanent` flags. When the camera comes back online and `wasListening=true`, event polling resumes automatically after a 2 s delay — no manual `start` message needed.
+- **`"reconnecting"` status handling**: Shows yellow ring without tearing down the existing subscription.
+
+#### `onvif_config.html`
+- Added **Reconnect** row to the config panel with `Initial backoff` and `Max` fields (in seconds).
+
+#### `utils.js`
+- Added `"reconnecting"` → yellow ring status indicator.
+
+---
+
+### 2026-02-24 — Race Condition Fixes (Tapo mid-handshake drops)
+
+**Problem:** Tapo cameras sometimes close the TCP connection mid-ONVIF-handshake, causing a cascade of errors: false `"connected"` status → events node immediately errors with "no event service" → "socket hang up" on capability reload.
+
+**Changes:**
+
+#### `onvif_config.js`
+- **`attemptConnect()`**: After `new onvif.Cam()` succeeds, verify `cam.capabilities` or `cam.services` are actually populated before emitting `"connected"`. If not (mid-handshake drop), treat as failure and retry with backoff.
+- **`startHealthCheck()`**: When health check finds `!capabilities && !services`, no longer calls `cam.connect()` again (which causes a second socket hang-up). Instead performs a full reconnect with a fresh `Cam` instance.
+
+#### `onvif_events.js`
+- **Graceful event service retry on reconnect**: Instead of immediately calling `node.receive({ action: "start" })`, checks whether the event service is available. Retries up to **5 times × 5 s** before giving up with a clear status message — eliminates flood of "no event service" errors during camera settle time.
+
 
 ## Install
 Run the following npm command in your Node-RED user directory (typically ~/.node-red), to install the latest beta version of this node from this Github repo:

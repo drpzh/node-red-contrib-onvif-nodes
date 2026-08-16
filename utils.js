@@ -13,16 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-exports.setNodeStatus = function(node, serviceName, onvifStatus) {
-    switch(onvifStatus) {
+exports.setNodeStatus = function (node, serviceName, onvifStatus) {
+    switch (onvifStatus) {
         case "unconfigured":
-            node.status({fill:"red",shape:"ring",text:onvifStatus});
+            node.status({ fill: "red", shape: "ring", text: onvifStatus });
             break;
         case "initializing":
-            node.status({fill:"yellow",shape:"dot",text:onvifStatus});
+            node.status({ fill: "yellow", shape: "dot", text: onvifStatus });
+            break;
+        case "reconnecting":
+            node.status({ fill: "yellow", shape: "ring", text: onvifStatus });
             break;
         case "disconnected":
-            node.status({fill:"red",shape:"ring",text:onvifStatus});
+            node.status({ fill: "red", shape: "ring", text: onvifStatus });
             break;
         case "connected":
             // Starting from agsh/onvif version  0.6.5, the cam.capabilities have become obsolete.
@@ -31,30 +34,30 @@ exports.setNodeStatus = function(node, serviceName, onvifStatus) {
             if (node.deviceConfig.cam.services || node.deviceConfig.cam.capabilities) {
                 // When connected to the Onvif device, the status depends on whether the device supports the specified service
                 if (exports.hasService(node.deviceConfig.cam, serviceName)) {
-                    node.status({fill:"green",shape:"dot",text:onvifStatus}); 
+                    node.status({ fill: "green", shape: "dot", text: onvifStatus });
                 }
                 else {
-                    node.status({fill:"red",shape:"ring",text:"unsupported"});  
+                    node.status({ fill: "red", shape: "ring", text: "unsupported" });
                 }
             }
             else {
-                node.status({fill:"red",shape:"ring",text:"no services"});
+                node.status({ fill: "red", shape: "ring", text: "no services" });
             }
             break;
         case "":
             node.status({});
             break;
         default:
-            node.status({fill:"red",shape:"ring",text:"unknown"});
+            node.status({ fill: "red", shape: "ring", text: "unknown" });
     }
 };
 
-exports.handleResult = function(node, err, date, xml, newMsg) {
+exports.handleResult = function (node, err, date, xml, newMsg) {
     if (err) {
         node.error(err.message);
 
         var lowercase = err.message.toLowerCase();
-        
+
         // Sometimes the OnVif device responds with errors like "Method Not Found", "Action Not Implemented", ... 
         // In that case we will show an error indicating that the action is not supported by the device.
         // WE WON'T SET A TEMPORARY NODE STATUS, BECAUSE OTHERWISE WE SHOULD SHOW THE ORIGINAL STATUS AGAIN AFTER SOME TIME
@@ -65,10 +68,10 @@ exports.handleResult = function(node, err, date, xml, newMsg) {
         //else {
         //    node.status({fill:"red",shape:"dot",text: "failed"});
         //}
-        
+
         // When a reconnect action fails, then the status needs to become 'disconnected' (because that is no temporary status unlike the others)
         if (newMsg.action == "reconnect") {
-            node.status({fill:"red",shape:"dot",text: "disconnected"});
+            node.status({ fill: "red", shape: "dot", text: "disconnected" });
         }
     }
     else {
@@ -76,12 +79,12 @@ exports.handleResult = function(node, err, date, xml, newMsg) {
             newMsg.payload = date;
             node.send(newMsg);
         }
-        
+
         // When a reconnect action succeeds, then the status needs to become 'connected' (because that is no temporary status unlike the others)
         if (newMsg.action == "reconnect") {
-            node.status({fill:"blue",shape:"dot",text: "connected"});
+            node.status({ fill: "blue", shape: "dot", text: "connected" });
         }
-    } 
+    }
 }
 
 exports.hasService = function (cam, serviceName) {
@@ -90,14 +93,14 @@ exports.hasService = function (cam, serviceName) {
         var hasService = cam.services.some(function (service) {
             return service.XAddr && service.XAddr.toLowerCase().includes(serviceName.toLowerCase());
         });
-        
+
         if (!hasService) {
             // Check whether there is a service available, whose namespace contains the specified service name
             hasService = cam.services.some(function (service) {
                 return service.namespace && service.namespace.toLowerCase().includes(serviceName.toLowerCase());
             });
         }
-        
+
         return hasService;
     }
     else if (cam.capabilities) {
