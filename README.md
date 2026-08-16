@@ -37,7 +37,7 @@ Node Red nodes for communicating with OnVif compliant IP devices
 
 ## Local Modifications (drpzh — Tapo Camera Stability)
 
-This fork contains custom patches on top of the original upstream code to improve stability with ~30 Tapo cameras in a warehouse environment.
+This fork contains custom patches on top of the original upstream code to improve stability with ~30 Tapo cameras in a warehouse environment at [Birmingham Self Storage](https://birminghamselfstorage.uk/).
 
 ### 2026-02-22 — Automatic Reconnection & Event Recovery
 
@@ -82,7 +82,7 @@ This fork contains custom patches on top of the original upstream code to improv
 ## Install
 Run the following npm command in your Node-RED user directory (typically ~/.node-red), to install the latest beta version of this node from this Github repo:
 ```
-npm install bartbutenaers/node-red-contrib-onvif-nodes
+npm install drpzh/node-red-contrib-onvif-nodes
 ```
 See the [releases](https://github.com/bartbutenaers/node-red-contrib-onvif-nodes/releases) page for an overview of what has changed per release.
 
