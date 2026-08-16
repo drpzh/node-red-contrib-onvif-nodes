@@ -13,7 +13,7 @@ Node Red nodes for communicating with OnVif compliant IP devices
 
 ---
 
-## Local Modifications (drpzh — Tapo Camera Stability)
+## Modifications to Improve Tapo Camera Stability
 
 This fork contains custom patches on top of the original upstream code to improve stability with ~30 Tapo cameras in a warehouse environment at [Birmingham Self Storage](https://birminghamselfstorage.uk/).
 
