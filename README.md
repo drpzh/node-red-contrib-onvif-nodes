@@ -84,7 +84,7 @@ Run the following npm command in your Node-RED user directory (typically ~/.node
 ```
 npm install drpzh/node-red-contrib-onvif-nodes
 ```
-See the [releases](https://github.com/bartbutenaers/node-red-contrib-onvif-nodes/releases) page for an overview of what has changed per release.
+See the [releases](https://github.com/drpzh/node-red-contrib-onvif-nodes/releases) page or commit history for an overview of changes.
 
 ## Support my Node-RED developments
 
