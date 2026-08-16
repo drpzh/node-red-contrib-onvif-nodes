@@ -1,28 +1,6 @@
 # node-red-contrib-onvif-nodes
 Node Red nodes for communicating with OnVif compliant IP devices
 
-**THIS IS AN EXPERIMENTAL NODE-RED CONTRIBUTION  !!!**
-
-*Update 28-11-2020: I get frequently the question why I haven't published these nodes on NPM yet.*
-
-*Well the answer is very simple: a lack of free time...*
-
-*Our friend @SuperNinja73 has been so kind to perform a large series of tests (see [test results](https://discourse.nodered.org/t/node-red-contrib-onvif-nodes-beta-test/33722/2?u=bartbutenaers)).*
-
-*Based on these test result, I concluded that the comera profile configuration via these nodes is not user friendly.*
-
-*But I don't have the time to develop and maintain an entire Onvif device manager inside Node-RED.*
-
-*To solve this I would like to generate automatically a user interface based on the [onvif.xsd](https://www.onvif.org/onvif/ver10/schema/onvif.xsd) file.*
-
-*I have compared some libraries, but at the end I [agreed](https://discourse.nodered.org/t/editor-based-on-xsd/33965/11?u=bartbutenaers) with Nick to implement this functionality in the Node-RED JSON editor.*
-
-*Because then it can be reused by other node developers.*
-
-*However it seems the JSON schema specification is rather large, so it is a hell of a job to implement this in my very limited time.*
-
-*That is why it is all taking so long ...*
-
 ---
 
 ## Tapo Camera Setup Instructions
